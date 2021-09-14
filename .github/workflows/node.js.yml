@@ -21,6 +21,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: create env file
+      run: |
+        touch .env
+        echo SERVICE_ACCOUNT =${{ secrets.SERVICE_ACCOUNT }} >> .env
+        
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -30,8 +35,6 @@ jobs:
         SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
         FBR: ${{ secrets.FBR }}
 
-    - run: export
-    - run: env
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
