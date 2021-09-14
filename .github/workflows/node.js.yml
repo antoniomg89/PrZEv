@@ -26,10 +26,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    env: 
+      env: 
         SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
         FBR: ${{ secrets.FBR}}
-        
+
     - run: export
     - run: npm ci
     - run: npm run build --if-present
