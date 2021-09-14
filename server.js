@@ -77,17 +77,13 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
     }
     
     let ref0 = fbdb.ref(r0);
-    //console.log('Ruta botón estado: ' + r0);
   
     ref0.once('value').then(async function(snapshot) {
       if (snapshot.exists()) {
         let botondatos = snapshot.val();
-      let botonestado = botondatos.estado;
-  
-      //console.log('Estado del botón: ' + botonestado);
-      
+        let botonestado = botondatos.estado;
+        
       if (botonestado == 'false') {
-        //res.json('Error');
         return reject('Caso imposible 1');
         
   
@@ -131,17 +127,14 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
               if (validadosusuario+1 == qrcontador) {
                 cc = coordenadascevento.split(';');
                 resultado = cc[validadosusuario];
-                //res.json(cc[validadosusuario]);
   
               } else if (validadosusuario+1 != qrcontador && estadocontador == 'false') {
                 let c = coordenadasevento.split(';');
                 resultado = c[validadosusuario];
-                //res.json(c[validadosusuario]);
   
               } else if (validadosusuario+1 != qrcontador && estadocontador == 'true') {
                 cc = coordenadascevento.split(';');
                 resultado = cc[validadosusuario];
-                //res.json(cc[validadosusuario]);
               }
   
               r4 = 'usuarioeventosmapa/' + uid + '/' + id;
@@ -152,7 +145,6 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
               let qrdataevento = eventodata.qrdata;
               let q = qrdataevento.split(';');
               resultado = q[validadosusuario];
-              //res.json(q[validadosusuario]);
   
               r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
               ref4 = fbdb.ref(r4);
@@ -170,15 +162,12 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
 
       } else {
         return reject('Caso imposible 2');
-      }
-      
+      }     
 
     });
 
-
   });
   
-
 }
 
 exports.getUsuarioEventoDatosPr = getUsuarioEventoDatosPr;
