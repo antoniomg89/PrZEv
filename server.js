@@ -59,11 +59,10 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
   return new Promise (function (resolve, reject) {
     if (!fb_iniciado) {
       firebase.initializeApp({
-        credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-        databaseURL: process.env.FBR
+          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
+          databaseURL: process.env.FBR
       });
       fb_iniciado = true;
-      
     }
   
     fbdb = firebase.database();
