@@ -143,8 +143,10 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
   
             } else {
               let qrdataevento = eventodata.qrdata;
+              let coordenadasevento = eventodata.coordenadas;
               let q = qrdataevento.split(';');
-              resultado = q[validadosusuario];
+              let c = coordenadasevento.split(';');
+              resultado = q[validadosusuario] + ';' + c[validadosusuario];
   
               r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
               ref4 = fbdb.ref(r4);
