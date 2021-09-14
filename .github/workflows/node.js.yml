@@ -28,9 +28,10 @@ jobs:
         cache: 'npm'
       env: 
         SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-        FBR: ${{ secrets.FBR}}
+        FBR: ${{ secrets.FBR }}
 
     - run: export
+    - run: env
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
