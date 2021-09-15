@@ -30,7 +30,7 @@ describe('Tests unitarios', function(){
 
     describe('Botón no pulsado (oferta):', function(){
         it('Caso imposible 1:', function(){
-            return server.getUsuarioOfertaDatosPr('EmpUltzb0exbjzfa','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada',true)
+            return server.getUsuarioOfertaDatosPr('EmpUltzb0exbjzfa','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada')
                 .then(function (resultado) { 
                     //expect(resultado).equal('Error');
                     expect(resultado).equal('Caso imposible 1');
@@ -43,7 +43,7 @@ describe('Tests unitarios', function(){
 
     describe('Ruta inexistente (oferta):', function(){
         it('Caso imposible 2:', function(){
-            return server.getUsuarioOfertaDatosPr('EmpUltzb','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada',true)
+            return server.getUsuarioOfertaDatosPr('EmpUltzb','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada')
                 .then(function (resultado) { 
                     //expect(resultado).equal('Error');
                     expect(resultado).equal('Caso imposible 2');
