@@ -54,4 +54,30 @@ describe('Tests unitarios', function(){
         });
     });
 
+    describe('Botón no pulsado (sensor):', function(){
+        it('Caso imposible 1:', function(){
+            return server.getUsuarioEventosSensorDatosPr('EmpUltzb0exbjzfa','TeoCEAwcmEX4GHTreCxvgINAVrM2')
+                .then(function (resultado) { 
+                    //expect(resultado).equal('Error');
+                    expect(resultado).equal('Caso imposible 1');
+                })
+                .catch(function (resultado) {
+                    
+                })
+        });
+    });
+
+    describe('Ruta inexistente (sensor):', function(){
+        it('Caso imposible 2:', function(){
+            return server.getUsuarioEventosSensorDatosPr('EmpUltzb','TeoCEAwcmEX4GHTreCxvgINAVrM2')
+                .then(function (resultado) { 
+                    //expect(resultado).equal('Error');
+                    expect(resultado).equal('Caso imposible 2');
+                })
+                .catch(function (resultado) {
+                    
+                })
+        });
+    });
+
 });

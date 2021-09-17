@@ -29,6 +29,24 @@ app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
 
 });
 
+app.get('/vgetsdata/:id/:uid', (req, res) => {
+  console.log('Petición de sensor del evento: ' + req.params['id'] + '...');
+
+  let id = req.params['id'];
+  let uid = req.params['uid'];
+  
+  getUsuarioEventosSensorDatosPr(id,uid)
+    .then((resultado) => { 
+      console.log('Promise recibida: ' + resultado);
+      res.json(resultado);
+    })
+    .catch((resultado) => {  
+      console.log('Promise recibida: ' + resultado);
+      res.json(resultado);
+    });
+
+});
+
 app.get('/vgetvaldata/:id/:uid/:ciu', (req, res) => {
   console.log('Petición de validación del evento: ' + req.params['id'] + '...');
 
@@ -250,5 +268,80 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
   
 }
 
+function getUsuarioEventosSensorDatosPr (id,uid) {
+  return new Promise (function (resolve, reject) {
+    if (!fb_iniciado) {
+      firebase.initializeApp({
+          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
+          databaseURL: process.env.FBR
+      });
+      fb_iniciado = true;
+    }
+  
+    fbdb = firebase.database();
+
+    //Se comprueba que el usuario haya presionado el botón del mapa.
+    let r0;
+    r0 = 'usuarioeventossensor/' + uid + '/' + id;
+   
+    let ref0 = fbdb.ref(r0);
+  
+    ref0.once('value').then(async function(snapshot) {
+      if (snapshot.exists()) {
+        let botondatos = snapshot.val();
+        let botonestado = botondatos.estado;
+        
+      if (botonestado == 'false') {
+        return reject('Caso imposible 1');
+        
+  
+        // Si el usuario ha pulsado el botón se comprueba su progreso en el juego.
+      } else {
+        let r1 = 'usuarioeventos/' + uid + '/' + id;
+        let ref1 = fbdb.ref(r1);
+  
+        ref1.once('value').then(function(snapshot) {
+        let eventousuario = snapshot.val();
+        let validadosusuario = eventousuario.cantidadValidados;
+  
+        console.log('Cantidad validados: ' + validadosusuario);
+  
+        let r3 = 'eventosData/' + id;
+        let ref3 = fbdb.ref(r3);
+    
+        // Se obtienen los datos correctos para devolver al usuario.
+        ref3.once('value').then(function(snapshot) {
+          let eventodata = snapshot.val();
+          let coordenadasevento = eventodata.coordenadas;
+          let c = coordenadasevento.split(';');
+          let r4, ref4, resultado;
+          let boton_actualizacion = {
+            estado: 'false'
+          };
+
+          resultado = c[validadosusuario];
+          r4 = 'usuarioeventossensor/' + uid + '/' + id;
+          ref4 = fbdb.ref(r4);
+          ref4.update(boton_actualizacion);
+
+          return resolve(resultado);      
+      
+        });
+        
+        });
+      
+      }
+
+      } else {
+        return reject('Caso imposible 2');
+      }     
+
+    });
+
+  });
+  
+}
+
 exports.getUsuarioEventoDatosPr = getUsuarioEventoDatosPr;
 exports.getUsuarioOfertaDatosPr = getUsuarioOfertaDatosPr;
+exports.getUsuarioEventosSensorDatosPr = getUsuarioEventosSensorDatosPr;
