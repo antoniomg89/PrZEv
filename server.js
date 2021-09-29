@@ -29,13 +29,14 @@ app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
 
 });
 
-app.get('/vgetsdata/:id/:uid', (req, res) => {
+app.get('/vgetsdata/:id/:uid/:ciu', (req, res) => {
   console.log('Petición de sensor del evento: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
+  let ciu = req.params['ciu'];
   
-  getUsuarioEventosSensorDatosPr(id,uid)
+  getUsuarioEventosSensorDatosPr(id,uid,ciu)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -204,7 +205,7 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
           let qrcontador = eventocontador.qr;
   
   
-          let r3 = 'eventosData/' + id;
+          let r3 = 'eventosData/' + ciu + '/' + id;
           let ref3 = fbdb.ref(r3);
       
           // Se obtienen los datos correctos para devolver al usuario.
@@ -268,7 +269,7 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
   
 }
 
-function getUsuarioEventosSensorDatosPr (id,uid) {
+function getUsuarioEventosSensorDatosPr (id,uid,ciu) {
   return new Promise (function (resolve, reject) {
     if (!fb_iniciado) {
       firebase.initializeApp({
@@ -306,7 +307,7 @@ function getUsuarioEventosSensorDatosPr (id,uid) {
   
         console.log('Cantidad validados: ' + validadosusuario);
   
-        let r3 = 'eventosData/' + id;
+        let r3 = 'eventosData/' + ciu + '/'  + id;
         let ref3 = fbdb.ref(r3);
     
         // Se obtienen los datos correctos para devolver al usuario.
