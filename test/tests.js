@@ -8,10 +8,10 @@ describe('Tests unitarios', function(){
          it('Caso imposible 1:', function(){
             return server.getUsuarioEventoDatosPr('projectz9857349857','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada',true)
                 .then(function (resultado) { 
-                    expect(resultado).equal('Error');
+                    expect(resultado).equal('Caso imposible 1');
                 })
                 .catch(function (resultado) {
-                    expect(resultado).equal('Caso imposible 1');
+
                 })
         });
     });
@@ -20,10 +20,10 @@ describe('Tests unitarios', function(){
         it('Caso imposible 2:', function(){
            return server.getUsuarioEventoDatosPr('projectz9857','TeoCEAwcmEX4GHTINAVrM2','granada',true)
                .then(function (resultado) { 
-                   expect(resultado).equal('Error');
+                expect(resultado).equal('Caso imposible 2');
                })
                .catch(function (resultado) {
-                   expect(resultado).equal('Caso imposible 2');
+                   
                })
        });
    });
