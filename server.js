@@ -10,7 +10,7 @@ let fbdb;
 app.set('port', (process.env.PORT || 4000));
 
 app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
-  console.log('Petición de mapa del evento: ' + req.params['id'] + '...');
+  console.log('Petición de mapa del juego: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
@@ -30,7 +30,7 @@ app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
 });
 
 app.get('/vgetsdata/:id/:uid/:ciu', (req, res) => {
-  console.log('Petición de sensor del evento: ' + req.params['id'] + '...');
+  console.log('Petición de sensor del juego: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
@@ -49,7 +49,7 @@ app.get('/vgetsdata/:id/:uid/:ciu', (req, res) => {
 });
 
 app.get('/vgetvaldata/:id/:uid/:ciu', (req, res) => {
-  console.log('Petición de validación del evento: ' + req.params['id'] + '...');
+  console.log('Petición de validación del juego: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
@@ -69,15 +69,14 @@ app.get('/vgetvaldata/:id/:uid/:ciu', (req, res) => {
 
 });
 
-app.get('/ogetvaldata/:id/:uid/:ciu/:loc', (req, res) => {
-  console.log('Petición de validación de la oferta: ' + req.params['id'] + '...');
+app.get('/vgetpstdata/:id/:uid/:ciu', (req, res) => {
+  console.log('Petición de pista del  juego: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
   let ciu = req.params['ciu'];
-  let loc = req.params['loc'];
 
-  getUsuarioOfertaDatosPr(id,uid,ciu,loc)
+  getUsuarioEventoDatosPst(id,uid,ciu)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -95,7 +94,7 @@ app.listen(app.get('port'), () => {
 
 })
 
-function getUsuarioOfertaDatosPr (id,uid,ciu,loc) {
+function getUsuarioEventoDatosPst (id,uid,ciu) {
   return new Promise (function (resolve, reject) {
     if (!fb_iniciado) {
       firebase.initializeApp({
@@ -107,8 +106,11 @@ function getUsuarioOfertaDatosPr (id,uid,ciu,loc) {
   
     fbdb = firebase.database();
 
-    //Se comprueba que el usuario haya presionado el botón del mapa.
-    let r0 = 'usuarioofertasvalidacion/' + uid + '/' + id;
+    //Se comprueba que el usuario haya presionado el botón de la pista.
+    let r0;
+    
+    r0 = 'usuarioeventospistas/' + uid + '/' + id;
+
     let ref0 = fbdb.ref(r0);
   
     ref0.once('value').then(async function(snapshot) {
@@ -116,30 +118,38 @@ function getUsuarioOfertaDatosPr (id,uid,ciu,loc) {
         let botondatos = snapshot.val();
         let botonestado = botondatos.estado;
         
-      if (botonestado == 'false') {
-        return reject('Caso imposible 1');
-        
-  
-        // Si el usuario ha pulsado el botón se obtienen los datos del qr de la oferta a validar..
-      } else {
-        let r3 = 'ofertasData/' + ciu + '/' + loc + '/' + id;
-        let ref3 = fbdb.ref(r3);
+        if (botonestado == 'false') {
+          return reject('Caso imposible 1');
+          
+    
+          // Si el usuario ha pulsado el botón se comprueba su progreso en el juego.
+        } else {
+          let r1 = 'usuarioeventos/' + uid + '/' + id;
+          let ref1 = fbdb.ref(r1);
+    
+          ref1.once('value').then(function(snapshot) {
+          let eventousuario = snapshot.val();
+          let validadosusuario = eventousuario.cantidadValidados;
+    
+          console.log('Cantidad validados: ' + validadosusuario);
+            
+          let r3 = 'eventosData/' + ciu + '/' + id;
+          let ref3 = fbdb.ref(r3);
+      
           // Se obtienen los datos correctos para devolver al usuario.
           ref3.once('value').then(function(snapshot) {
-            let ofertadata = snapshot.val();
-            let qrdataoferta = ofertadata.qrdata;
-            let boton_actualizacion = {
-              estado: 'false'
-            };
-  
-            let r4 = 'usuarioofertasvalidacion/' + uid + '/' + id;
-            let ref4 = fbdb.ref(r4);
-            ref4.update(boton_actualizacion);
+            let eventodata = snapshot.val();
             
-            return resolve(qrdataoferta);      
-        
+            let pistasevento = eventodata.pistas;
+            let pst = pistasevento.split(';');
+            resultado = pst[validadosusuario];
+
+            console.log('Resultado devuelto: ' + resultado);
+            return resolve(resultado);
+            
           });
-        
+          
+        });
       }
 
       } else {
@@ -180,81 +190,81 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
         let botondatos = snapshot.val();
         let botonestado = botondatos.estado;
         
-      if (botonestado == 'false') {
-        return reject('Caso imposible 1');
+        if (botonestado == 'false') {
+          return reject('Caso imposible 1');
+          
+    
+          // Si el usuario ha pulsado el botón se comprueba su progreso en el juego.
+        } else {
+          let r1 = 'usuarioeventos/' + uid + '/' + id;
+          let ref1 = fbdb.ref(r1);
+    
+          ref1.once('value').then(function(snapshot) {
+          let eventousuario = snapshot.val();
+          let validadosusuario = eventousuario.cantidadValidados;
+    
+          console.log('Cantidad validados: ' + validadosusuario);
+    
+          let r2 = 'eventosContador/' + ciu + '/' + id + '/qr';
+          let ref2 = fbdb.ref(r2);
         
-  
-        // Si el usuario ha pulsado el botón se comprueba su progreso en el juego.
-      } else {
-        let r1 = 'usuarioeventos/' + uid + '/' + id;
-        let ref1 = fbdb.ref(r1);
-  
-        ref1.once('value').then(function(snapshot) {
-        let eventousuario = snapshot.val();
-        let validadosusuario = eventousuario.cantidadValidados;
-  
-        console.log('Cantidad validados: ' + validadosusuario);
-  
-        let r2 = 'eventosContador/' + ciu + '/' + id + '/qr';
-        let ref2 = fbdb.ref(r2);
-      
-        // Se comprueba el estado del evento actual.
-        ref2.once('value').then(function(snapshot) {
-          let eventocontador = snapshot.val();
-          let estadocontador = eventocontador.estado;
-          let qrcontador = eventocontador.qr;
-  
-  
-          let r3 = 'eventosData/' + ciu + '/' + id;
-          let ref3 = fbdb.ref(r3);
-      
-          // Se obtienen los datos correctos para devolver al usuario.
-          ref3.once('value').then(function(snapshot) {
-            let eventodata = snapshot.val();
-            let r4, ref4, resultado;
-            let boton_actualizacion = {
-              estado: 'false'
-            };
-  
-            if (mapa) {
-              let coordenadasevento = eventodata.coordenadas;
-              let coordenadascevento = eventodata.coordenadasc;
-              let cc;
-              
-              if (validadosusuario+1 == qrcontador) {
-                cc = coordenadascevento.split(';');
-                resultado = cc[validadosusuario];
-  
-              } else if (validadosusuario+1 != qrcontador && estadocontador == 'false') {
+          // Se comprueba el estado del evento actual.
+          ref2.once('value').then(function(snapshot) {
+            let eventocontador = snapshot.val();
+            let estadocontador = eventocontador.estado;
+            let qrcontador = eventocontador.qr;
+    
+    
+            let r3 = 'eventosData/' + ciu + '/' + id;
+            let ref3 = fbdb.ref(r3);
+        
+            // Se obtienen los datos correctos para devolver al usuario.
+            ref3.once('value').then(function(snapshot) {
+              let eventodata = snapshot.val();
+              let r4, ref4, resultado;
+              let boton_actualizacion = {
+                estado: 'false'
+              };
+    
+              if (mapa) {
+                let coordenadasevento = eventodata.coordenadas;
+                let coordenadascevento = eventodata.coordenadasc;
+                let cc;
+                
+                if (validadosusuario+1 == qrcontador) {
+                  cc = coordenadascevento.split(';');
+                  resultado = cc[validadosusuario];
+    
+                } else if (validadosusuario+1 != qrcontador && estadocontador == 'false') {
+                  let c = coordenadasevento.split(';');
+                  resultado = c[validadosusuario];
+    
+                } else if (validadosusuario+1 != qrcontador && estadocontador == 'true') {
+                  cc = coordenadascevento.split(';');
+                  resultado = cc[validadosusuario];
+                }
+    
+                r4 = 'usuarioeventosmapa/' + uid + '/' + id;
+                ref4 = fbdb.ref(r4);
+                ref4.update(boton_actualizacion);
+    
+              } else {
+                let qrdataevento = eventodata.qrdata;
+                let coordenadasevento = eventodata.coordenadas;
+                let q = qrdataevento.split(';');
                 let c = coordenadasevento.split(';');
-                resultado = c[validadosusuario];
-  
-              } else if (validadosusuario+1 != qrcontador && estadocontador == 'true') {
-                cc = coordenadascevento.split(';');
-                resultado = cc[validadosusuario];
+                resultado = q[validadosusuario] + ';' + c[validadosusuario];
+    
+                r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
+                ref4 = fbdb.ref(r4);
+                ref4.update(boton_actualizacion);
+    
               }
-  
-              r4 = 'usuarioeventosmapa/' + uid + '/' + id;
-              ref4 = fbdb.ref(r4);
-              ref4.update(boton_actualizacion);
-  
-            } else {
-              let qrdataevento = eventodata.qrdata;
-              let coordenadasevento = eventodata.coordenadas;
-              let q = qrdataevento.split(';');
-              let c = coordenadasevento.split(';');
-              resultado = q[validadosusuario] + ';' + c[validadosusuario];
-  
-              r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
-              ref4 = fbdb.ref(r4);
-              ref4.update(boton_actualizacion);
-  
-            }
-            return resolve(resultado);      
-        
+              return resolve(resultado);      
+          
+            });
+          
           });
-        
-        });
       
         });
       }
@@ -344,5 +354,5 @@ function getUsuarioEventosSensorDatosPr (id,uid,ciu) {
 }
 
 exports.getUsuarioEventoDatosPr = getUsuarioEventoDatosPr;
-exports.getUsuarioOfertaDatosPr = getUsuarioOfertaDatosPr;
+exports.getUsuarioEventoDatosPst = getUsuarioEventoDatosPst;
 exports.getUsuarioEventosSensorDatosPr = getUsuarioEventosSensorDatosPr;

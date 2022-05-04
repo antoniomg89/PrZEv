@@ -28,9 +28,9 @@ describe('Tests unitarios', function(){
        });
    });
 
-    describe('Botón no pulsado (oferta):', function(){
+    describe('Botón pista no pulsado (evento):', function(){
         it('Caso imposible 1:', function(){
-            return server.getUsuarioOfertaDatosPr('zb0exbjzfa','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada')
+            return server.getUsuarioEventoDatosPst('9857349857','mdjtxITyV0d3cNFwI0nzMoAVwZv1','granada')
                 .then(function (resultado) { 
                     expect(resultado).equal('Caso imposible 1');
                 })
@@ -40,9 +40,9 @@ describe('Tests unitarios', function(){
         });
     });
 
-    describe('Ruta inexistente (oferta):', function(){
+    describe('Ruta inexistente pista (evento):', function(){
         it('Caso imposible 2:', function(){
-            return server.getUsuarioOfertaDatosPr('EmpUltzb','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada','granada')
+            return server.getUsuarioEventoDatosPst('9857349857','TeoCEAwcmEX4GHTreCxvgINAVrM2','granada')
                 .then(function (resultado) { 
                     expect(resultado).equal('Caso imposible 2');
                 })
