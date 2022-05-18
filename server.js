@@ -16,8 +16,11 @@ app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
   let uid = req.params['uid'];
   let ciu = req.params['ciu'];
   let mapa = true;
-  
-  getUsuarioEventoDatosPr(id,uid,ciu,mapa)
+
+  validateToken(uid)
+  .then((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    getUsuarioEventoDatosPr(id,resultado,ciu,mapa)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -26,17 +29,27 @@ app.get('/vgetmdata/:id/:uid/:ciu', (req, res) => {
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
     });
+  })
+  .catch((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    res.json(resultado);
+  })
 
 });
 
-app.get('/vgetsdata/:id/:uid/:ciu', (req, res) => {
+app.get('/vgetsdata/:id/:uid/:ciu/:lat/:long', (req, res) => {
   console.log('Petición de sensor del juego: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
   let ciu = req.params['ciu'];
-  
-  getUsuarioEventosSensorDatosPr(id,uid,ciu)
+  let lat = req.params['lat'];
+  let long = req.params['long'];
+
+  validateToken(uid)
+  .then((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    getUsuarioEventosSensorDatosPr(id,resultado,ciu,lat,long)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -45,18 +58,29 @@ app.get('/vgetsdata/:id/:uid/:ciu', (req, res) => {
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
     });
+  })
+  .catch((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    res.json(resultado);
+  })
 
 });
 
-app.get('/vgetvaldata/:id/:uid/:ciu', (req, res) => {
-  console.log('Petición de validación del juego: ' + req.params['id'] + '...');
+app.get('/vgetvaldata/:id/:uid/:ciu/:lat/:long/:infoqr', (req, res) => {
+  console.log('Petición de validación de código QR: ' + req.params['id'] + '...');
 
   let id = req.params['id'];
   let uid = req.params['uid'];
   let ciu = req.params['ciu'];
+  let lat = req.params['lat'];
+  let long = req.params['long'];
+  let infoqr = req.params['infoqr'];
   let mapa = false;
 
-  getUsuarioEventoDatosPr(id,uid,ciu,mapa)
+  validateToken(uid)
+  .then((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    getUsuarioEventoDatosPr(id,resultado,ciu,mapa,lat,long,infoqr)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -65,7 +89,11 @@ app.get('/vgetvaldata/:id/:uid/:ciu', (req, res) => {
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
     });
-
+  })
+  .catch((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    res.json(resultado);
+  })
 
 });
 
@@ -76,7 +104,10 @@ app.get('/vgetpstdata/:id/:uid/:ciu', (req, res) => {
   let uid = req.params['uid'];
   let ciu = req.params['ciu'];
 
-  getUsuarioEventoDatosPst(id,uid,ciu)
+  validateToken(uid)
+  .then((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    getUsuarioEventoDatosPst(id,resultado,ciu)
     .then((resultado) => { 
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
@@ -85,7 +116,11 @@ app.get('/vgetpstdata/:id/:uid/:ciu', (req, res) => {
       console.log('Promise recibida: ' + resultado);
       res.json(resultado);
     });
-
+  })
+  .catch((resultado) => {
+    console.log('Promise recibida: ' + resultado);
+    res.json(resultado);
+  })
 
 });
 
@@ -96,16 +131,6 @@ app.listen(app.get('port'), () => {
 
 function getUsuarioEventoDatosPst (id,uid,ciu) {
   return new Promise (function (resolve, reject) {
-    if (!fb_iniciado) {
-      firebase.initializeApp({
-          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-          databaseURL: process.env.FBR
-      });
-      fb_iniciado = true;
-    }
-  
-    fbdb = firebase.database();
-
     //Se comprueba que el usuario haya presionado el botón de la pista.
     let r0;
     
@@ -162,18 +187,8 @@ function getUsuarioEventoDatosPst (id,uid,ciu) {
   
 }
 
-function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
+function getUsuarioEventoDatosPr (id,uid,ciu,mapa,lat,long,infoqr) {
   return new Promise (function (resolve, reject) {
-    if (!fb_iniciado) {
-      firebase.initializeApp({
-          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-          databaseURL: process.env.FBR
-      });
-      fb_iniciado = true;
-    }
-  
-    fbdb = firebase.database();
-
     //Se comprueba que el usuario haya presionado el botón del mapa.
     let r0;
     
@@ -247,20 +262,43 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
                 r4 = 'usuarioeventosmapa/' + uid + '/' + id;
                 ref4 = fbdb.ref(r4);
                 ref4.update(boton_actualizacion);
+
+                return resolve(resultado);  
     
               } else {
                 let qrdataevento = eventodata.qrdata;
                 let coordenadasevento = eventodata.coordenadas;
                 let q = qrdataevento.split(';');
                 let c = coordenadasevento.split(';');
-                resultado = q[validadosusuario] + ';' + c[validadosusuario];
+                let coord = c[validadosusuario].split(',');
+                let latjuego = coord[0];
+                let longjuego = coord[1];
+                let distancia;
+
+                distancia = resDistances(lat,long,latjuego,longjuego);
+                console.log('Distancia calculada: ' + distancia);
+
+                if (distancia > 1000) {
+                  return reject('lejos');
+
+                } else if (infoqr == q[validadosusuario]){
+                  resultado = 'ok';
+
+                  /*r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
+                  ref4 = fbdb.ref(r4);
+                  ref4.update(boton_actualizacion);*/
+
+                  return resolve(resultado);
+ 
+                } else {
+                  return reject('error')
+                }
+
+                //resultado = q[validadosusuario] + ';' + c[validadosusuario];
     
-                r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
-                ref4 = fbdb.ref(r4);
-                ref4.update(boton_actualizacion);
+                
     
-              }
-              return resolve(resultado);      
+              }    
           
             });
           
@@ -279,18 +317,8 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa) {
   
 }
 
-function getUsuarioEventosSensorDatosPr (id,uid,ciu) {
+function getUsuarioEventosSensorDatosPr (id,uid,ciu,lat,long) {
   return new Promise (function (resolve, reject) {
-    if (!fb_iniciado) {
-      firebase.initializeApp({
-          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-          databaseURL: process.env.FBR
-      });
-      fb_iniciado = true;
-    }
-  
-    fbdb = firebase.database();
-
     //Se comprueba que el usuario haya presionado el botón del mapa.
     let r0;
     r0 = 'usuarioeventossensor/' + uid + '/' + id;
@@ -325,15 +353,19 @@ function getUsuarioEventosSensorDatosPr (id,uid,ciu) {
           let eventodata = snapshot.val();
           let coordenadasevento = eventodata.coordenadas;
           let c = coordenadasevento.split(';');
+          let coord = c[validadosusuario].split(',');
+          let latjuego = coord[0];
+          let longjuego = coord[1];
           let r4, ref4, resultado;
-          let boton_actualizacion = {
-            estado: 'false'
-          };
 
-          resultado = c[validadosusuario];
+          console.log(lat + ',' + long + '\n' + latjuego + ',' + longjuego);
+        
+          resultado = resDistances(lat,long,latjuego,longjuego);
+          console.log('Distancia calculada: ' + resultado);
+
+          /*resultado = c[validadosusuario];
           r4 = 'usuarioeventossensor/' + uid + '/' + id;
-          ref4 = fbdb.ref(r4);
-          ref4.update(boton_actualizacion);
+          ref4 = fbdb.ref(r4);*/
 
           return resolve(resultado);      
       
@@ -351,6 +383,46 @@ function getUsuarioEventosSensorDatosPr (id,uid,ciu) {
 
   });
   
+}
+
+function validateToken(token) {
+  return new Promise (function (resolve, reject) {
+    if (!fb_iniciado) {
+      firebase.initializeApp({
+          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
+          databaseURL: process.env.FBR
+          
+      });
+      fb_iniciado = true;
+      fbdb = firebase.database();
+    }
+
+    firebase.auth()
+    .verifyIdToken(token)
+    .then((decodedToken) => {
+      const uid = decodedToken.uid;
+      console.log('UID: ' + uid);
+      return resolve(uid)
+    })
+    .catch((error) => {
+      console.log('Error: ' + error)
+      return reject('error token');
+    })
+  });
+}
+
+function resDistances(lat,long,latjuego,longjuego) {
+  let r = 6371; // km
+  let dLatitud = (latjuego - lat)*Math.PI / 180;
+  let dLongitud = (longjuego - long)*Math.PI / 180;
+  let latitud1 = (lat)*Math.PI / 180;
+  let latitud2 = (latjuego)*Math.PI / 180;
+
+  let a = Math.sin(dLatitud/2) * Math.sin(dLatitud/2) + Math.sin(dLongitud/2) * Math.sin(dLongitud/2) * Math.cos(latitud1) * Math.cos(latitud2); 
+  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  let d = r * c;
+
+  return d*1000;
 }
 
 exports.getUsuarioEventoDatosPr = getUsuarioEventoDatosPr;
