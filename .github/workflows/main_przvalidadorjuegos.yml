@@ -11,6 +11,9 @@ on:
 
 jobs:
   build:
+    env: 
+        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        FBR: ${{ secrets.FBR }}
     runs-on: ubuntu-latest
 
     steps:
