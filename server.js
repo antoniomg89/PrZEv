@@ -365,10 +365,6 @@ function getUsuarioEventosSensorDatosPr (id,uid,ciu,lat,long) {
           resultado = resDistances(lat,long,latjuego,longjuego);
           console.log('Distancia calculada: ' + resultado);
 
-          /*resultado = c[validadosusuario];
-          r4 = 'usuarioeventossensor/' + uid + '/' + id;
-          ref4 = fbdb.ref(r4);*/
-
           return resolve(resultado);      
       
         });
@@ -391,10 +387,8 @@ function validateToken(token) {
   return new Promise (function (resolve, reject) {
     if (!fb_iniciado) {
       firebase.initializeApp({
-          //credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-          credential: firebase.credential.cert('./projectz-d7419-firebase-adminsdk-tlwny-65ff7dd3ee.json'),
-          //databaseURL: process.env.FBR
-          databaseURL: 'https://projectz-d7419.firebaseio.com'
+          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
+          databaseURL: process.env.FBR
       });
       fb_iniciado = true;
       fbdb = firebase.database();
