@@ -277,6 +277,8 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa,lat,long,infoqr) {
 
                 distancia = resDistances(lat,long,latjuego,longjuego);
                 console.log('Distancia calculada: ' + distancia);
+                console.log('infoqr: ' + infoqr);
+                console.log('infoqr: ' + q[validadosusuario]);
 
                 if (distancia > 1000) {
                   return reject('lejos');
@@ -389,9 +391,10 @@ function validateToken(token) {
   return new Promise (function (resolve, reject) {
     if (!fb_iniciado) {
       firebase.initializeApp({
-          credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
-          databaseURL: process.env.FBR
-          
+          //credential: firebase.credential.cert(JSON.parse(Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('ascii'))),
+          credential: firebase.credential.cert('./projectz-d7419-firebase-adminsdk-tlwny-65ff7dd3ee.json'),
+          //databaseURL: process.env.FBR
+          databaseURL: 'https://projectz-d7419.firebaseio.com'
       });
       fb_iniciado = true;
       fbdb = firebase.database();
