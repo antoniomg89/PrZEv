@@ -280,26 +280,17 @@ function getUsuarioEventoDatosPr (id,uid,ciu,mapa,lat,long,infoqr) {
                 console.log('infoqr: ' + infoqr);
                 console.log('infoqr: ' + q[validadosusuario]);
 
-                if (distancia > 1000) {
+                if (distancia > 10) {
                   return reject('lejos');
 
                 } else if (infoqr == q[validadosusuario]){
                   resultado = 'ok';
-
-                  /*r4 = 'usuarioeventosvalidacion/' + uid + '/' + id;
-                  ref4 = fbdb.ref(r4);
-                  ref4.update(boton_actualizacion);*/
-
                   return resolve(resultado);
  
                 } else {
                   return reject('error')
                 }
 
-                //resultado = q[validadosusuario] + ';' + c[validadosusuario];
-    
-                
-    
               }    
           
             });
